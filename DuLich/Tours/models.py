@@ -25,3 +25,11 @@ class Tours(models.Model):
     price = models.CharField(max_length=100, null=False)
     active = models.BooleanField(default=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='category', related_query_name='my_category')
+    tags = models.ManyToManyField('Tag', related_name='tags', related_query_name='my_tags')
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=50, unique=True, null=False)
+
+    def __str__(self):
+        return self.name

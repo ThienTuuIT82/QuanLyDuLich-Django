@@ -40,8 +40,20 @@ INSTALLED_APPS = [
     'Tours.apps.ToursConfig',
     'ckeditor',
     'ckeditor_uploader',
-    'rest_framework'
+    'oauth2_provider',
+    'rest_framework',
+    'drf_yasg',
+    'debug_toolbar',
+    'corsheaders'
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 2,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+    )
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -51,6 +63,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
+]
+
+CORS_ALLOWED_ORIGINS = ["http://127.0.0.1:5500"]
+
+INTERNAL_IPS = [
+    '127.0.0.1'
 ]
 
 ROOT_URLCONF = 'DuLich.urls'
