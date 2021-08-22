@@ -2,13 +2,14 @@ from django.shortcuts import render
 from rest_framework import viewsets, permissions, status, generics
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
-from .models import Tours, Account
-from .serializers import TourSerializer, AccountSerializer
+from .models import Tours, Account, TourBooking, Payment
+from .serializers import TourSerializer, AccountSerializer, TourBookingSerializer, PaymentSerializer
 from rest_framework.decorators import action
 from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+
 
 class AccountViewSet(viewsets.ViewSet,
+                     generics.ListAPIView,
                      generics.CreateAPIView,
                      generics.RetrieveAPIView,
                      generics.UpdateAPIView):
@@ -35,7 +36,6 @@ class TourViewSet(viewsets.ModelViewSet):
             status.HTTP_200_OK: TourSerializer()
         }
     )
-
     def get_permissions(self):
         if self.action == 'list':
             return [permissions.AllowAny()]
@@ -55,5 +55,27 @@ class TourViewSet(viewsets.ModelViewSet):
                         status=status.HTTP_200_OK)
 
 
+class TourBookingViewSet(viewsets.ModelViewSet):
+    queryset = TourBooking.objects.all()
+    serializer_class = TourBookingSerializer
+
+    def get_permissions(self):
+        if self.action == 'list':
+            return [permissions.AllowAny()]
+
+        return [permissions.IsAuthenticated()]
+
+
+class PaymentViewSet(viewsets.ModelViewSet):
+    queryset = Payment.objects.all()
+    serializer_class = PaymentSerializer
+
+    def get_permissions(self):
+        if self.action == 'list':
+            return [permissions.AllowAny()]
+
+        return [permissions.IsAuthenticated()]
+
+
 def index(request):
-    return render(request, template_name='index.html', context={'name':'Tuu'})
+    return render(request, template_name='index.html', context={'name': 'Tuu'})

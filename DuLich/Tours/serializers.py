@@ -1,11 +1,11 @@
 from rest_framework.serializers import ModelSerializer
-from .models import Tours, Tag, Account
+from .models import Tours, Tag, Account, Payment, TourBooking, RateTour, CommentTour
 
 
 class AccountSerializer(ModelSerializer):
     class Meta:
         model = Account
-        fields = ["id", "first_name", "last_name", "email", "username", "password", "avatar"]
+        fields = ["id", "first_name", "last_name", "email", "username", "password", "avatar", "gender", "phone", "birth", "role", "street", "city", "about"]
         extra_kwags = {
             'password': {'write_only': 'true'}
         }
@@ -30,3 +30,27 @@ class TourSerializer(ModelSerializer):
     class Meta:
         model = Tours
         fields = ["id", "name", "start_date", "finish_date", "destination", "photos", "price", "active", "category", "tags"]
+
+
+class PaymentSerializer(ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = ["id", "date", "price", "description", "user", "method"]
+
+
+class TourBookingSerializer(ModelSerializer):
+    class Meta:
+        model = TourBooking
+        fields = ["id", "date", "price", "user", "status"]
+
+
+class RateTourSerializer(ModelSerializer):
+    class Meta:
+        model = RateTour
+        fields = ["id", "rate", "user", "tour"]
+
+
+class CommentTourSerializer(ModelSerializer):
+    class Meta:
+        model = CommentTour
+        fields = ["id", "comment", "photo", "user", "tour"]
