@@ -2,8 +2,9 @@ from django.shortcuts import render
 from rest_framework import viewsets, permissions, status, generics
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
-from .models import Tours, Account, TourBooking, Payment
-from .serializers import TourSerializer, AccountSerializer, TourBookingSerializer, PaymentSerializer
+from .models import Tours, Account, TourBooking, Payment, RateTour, CommentTour
+from .serializers import TourSerializer, AccountSerializer, TourBookingSerializer, PaymentSerializer, \
+    RateTourSerializer, CommentTourSerializer
 from rest_framework.decorators import action
 from drf_yasg.utils import swagger_auto_schema
 
@@ -69,6 +70,28 @@ class TourBookingViewSet(viewsets.ModelViewSet):
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
+
+    def get_permissions(self):
+        if self.action == 'list':
+            return [permissions.AllowAny()]
+
+        return [permissions.IsAuthenticated()]
+
+
+class RateTourViewSet(viewsets.ModelViewSet):
+    queryset = RateTour.objects.all()
+    serializer_class = RateTourSerializer
+
+    def get_permissions(self):
+        if self.action == 'list':
+            return [permissions.AllowAny()]
+
+        return [permissions.IsAuthenticated()]
+
+
+class CommentTourViewSet(viewsets.ModelViewSet):
+    queryset = CommentTour.objects.all()
+    serializer_class = CommentTourSerializer
 
     def get_permissions(self):
         if self.action == 'list':

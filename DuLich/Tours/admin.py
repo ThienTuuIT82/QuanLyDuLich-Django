@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Tours, Category, Account, Payment, TourBooking
+from .models import Tours, Category, Account, Payment, TourBooking, RateTour, CommentTour
 from django.utils.html import mark_safe
 from django import forms
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
@@ -47,8 +47,8 @@ class AccountAdmin(admin.ModelAdmin):
 
 
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ['date', 'price', 'description', 'user', 'method']
-    search_fields = ['date', 'price', 'user__username']
+    list_display = ['date', 'price', 'description', 'user', 'tour', 'method']
+    search_fields = ['date', 'price', 'user__username', 'tour__name', 'method']
 
 
 class TourBookingAdmin(admin.ModelAdmin):
@@ -56,8 +56,20 @@ class TourBookingAdmin(admin.ModelAdmin):
     search_fields = ['user', 'status', 'user__username']
 
 
+class RateTourAdmin(admin.ModelAdmin):
+    list_display = ['rate', 'user', 'tour']
+    search_fields = ['rate', 'user__username', 'tour__name']
+
+
+class CommentTourAdmin(admin.ModelAdmin):
+    list_display = ['comment', 'photo', 'user', 'tour']
+    search_fields = ['comment', 'photo', 'user__username', 'tour__name']
+
+
 admin_site.register(Tours, ToursAdmin)
 admin_site.register(Category, CategoryAdmin)
 admin_site.register(Account, AccountAdmin)
 admin_site.register(Payment, PaymentAdmin)
 admin_site.register(TourBooking, TourBookingAdmin)
+admin_site.register(RateTour, RateTourAdmin)
+admin_site.register(CommentTour, CommentTourAdmin)

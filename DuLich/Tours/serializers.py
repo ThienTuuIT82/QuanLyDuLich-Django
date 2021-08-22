@@ -35,7 +35,7 @@ class TourSerializer(ModelSerializer):
 class PaymentSerializer(ModelSerializer):
     class Meta:
         model = Payment
-        fields = ["id", "date", "price", "description", "user", "method"]
+        fields = ["id", "date", "price", "description", "user", "tour", "method"]
 
 
 class TourBookingSerializer(ModelSerializer):
