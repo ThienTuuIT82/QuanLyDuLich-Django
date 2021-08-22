@@ -4,6 +4,7 @@ from enum import Enum
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from ckeditor.fields import RichTextField
+from django.utils import timezone
 
 
 class Role(Enum):
@@ -38,7 +39,7 @@ class Account(AbstractUser):
     class Meta:
         unique_together: {'username', 'role'}
     gender = models.CharField(max_length=20, choices=[(g.name, g.value) for g in Gender], default=Gender.MALE.value, null=True)
-    birth = models.DateField(null=False, default=date.today())
+    birth = models.DateField(null=False, default=timezone.now())
     phone = models.CharField(max_length=12, null=True, blank=True)
     role = models.CharField(max_length=20, choices=[(r.name, r.value) for r in Role], default=Role.USER.value)
     avatar = models.ImageField(upload_to='upload/avatars/%Y/%m', null=True, blank=True)

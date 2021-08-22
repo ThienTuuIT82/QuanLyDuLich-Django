@@ -29,7 +29,7 @@ class TourSerializer(ModelSerializer):
 
     class Meta:
         model = Tours
-        fields = ["id", "name", "start_date", "finish_date", "destination", "photos", "price", "active", "category", "tags"]
+        fields = ["id", "name", "description", "start_date", "finish_date", "destination", "photos", "price", "active", "category", "tags"]
 
 
 class PaymentSerializer(ModelSerializer):
