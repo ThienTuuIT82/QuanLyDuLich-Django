@@ -49,10 +49,14 @@ INSTALLED_APPS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 2,
+    'PAGE_SIZE': 9,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
     )
+}
+
+OAUTH2_PROVIDER = {
+    'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore'
 }
 
 MIDDLEWARE = [
@@ -67,7 +71,8 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware'
 ]
 
-CORS_ALLOWED_ORIGINS = ["http://127.0.0.1:5500"]
+CORS_ORIGIN_ALLOW_ALL = True
+
 
 INTERNAL_IPS = [
     '127.0.0.1'
@@ -102,8 +107,11 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'toursdb',
         'USER': 'root',
-        'PASSWORD': '123456',
-        'HOST': ''
+        'PASSWORD': '',
+        'HOST': '',
+        'OPTIONS': {
+           'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        }
     }
 }
 
@@ -147,8 +155,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-MEDIA_ROOT = '%s/Tours/static' % BASE_DIR
-CKEDITOR_UPLOAD_PATH = 'Tours/'
+MEDIA_ROOT = '%s/Tours/' % BASE_DIR
+CKEDITOR_UPLOAD_PATH = 'tours/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

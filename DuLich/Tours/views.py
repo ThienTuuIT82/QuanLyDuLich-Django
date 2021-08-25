@@ -1,10 +1,11 @@
 from django.shortcuts import render
 from rest_framework import viewsets, permissions, status, generics
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
-from .models import Tours, Account, TourBooking, Payment, RateTour, CommentTour
+from .models import Tours, Account, TourBooking, Payment, RateTour, CommentTour, Category
 from .serializers import TourSerializer, AccountSerializer, TourBookingSerializer, PaymentSerializer, \
-    RateTourSerializer, CommentTourSerializer
+    RateTourSerializer, CommentTourSerializer, CategorySerializer
 from rest_framework.decorators import action
 from drf_yasg.utils import swagger_auto_schema
 
@@ -26,9 +27,16 @@ class AccountViewSet(viewsets.ViewSet,
         return [permissions.AllowAny()]
 
 
-class TourViewSet(viewsets.ModelViewSet):
+class ToursPagination(PageNumberPagination):
+    page_size = 9
+
+
+class TourViewSet(viewsets.ModelViewSet,
+                     generics.ListAPIView,
+                     generics.CreateAPIView):
     queryset = Tours.objects.filter(active=True)
     serializer_class = TourSerializer
+    pagination_class = ToursPagination
     # permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(
@@ -81,6 +89,17 @@ class PaymentViewSet(viewsets.ModelViewSet):
 class RateTourViewSet(viewsets.ModelViewSet):
     queryset = RateTour.objects.all()
     serializer_class = RateTourSerializer
+
+    def get_permissions(self):
+        if self.action == 'list':
+            return [permissions.AllowAny()]
+
+        return [permissions.IsAuthenticated()]
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
     def get_permissions(self):
         if self.action == 'list':

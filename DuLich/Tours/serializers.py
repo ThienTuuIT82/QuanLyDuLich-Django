@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from .models import Tours, Tag, Account, Payment, TourBooking, RateTour, CommentTour
+from .models import Tours, Tag, Account, Payment, TourBooking, RateTour, CommentTour, Category
 
 
 class AccountSerializer(ModelSerializer):
@@ -16,6 +16,12 @@ class AccountSerializer(ModelSerializer):
         account.save()
 
         return account
+
+
+class CategorySerializer(ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ["id", "name"]
 
 
 class TagSerializer(ModelSerializer):

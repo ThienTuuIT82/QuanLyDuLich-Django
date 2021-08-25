@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Tours, Category, Account, Payment, TourBooking, RateTour, CommentTour
+from .models import Tours, Category, Account, Payment, TourBooking, RateTour, CommentTour, Tag
 from django.utils.html import mark_safe
 from django import forms
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
@@ -66,6 +66,11 @@ class CommentTourAdmin(admin.ModelAdmin):
     search_fields = ['comment', 'photo', 'user__username', 'tour__name']
 
 
+class TagAdmin(admin.ModelAdmin):
+    list_display = ['name']
+    search_fields = ['name']
+
+
 admin_site.register(Tours, ToursAdmin)
 admin_site.register(Category, CategoryAdmin)
 admin_site.register(Account, AccountAdmin)
@@ -73,3 +78,4 @@ admin_site.register(Payment, PaymentAdmin)
 admin_site.register(TourBooking, TourBookingAdmin)
 admin_site.register(RateTour, RateTourAdmin)
 admin_site.register(CommentTour, CommentTourAdmin)
+admin_site.register(Tag, TagAdmin)

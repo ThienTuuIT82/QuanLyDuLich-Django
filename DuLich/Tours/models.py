@@ -37,12 +37,12 @@ class Status(Enum):
 
 class Account(AbstractUser):
     class Meta:
-        unique_together: {'username', 'role'}
+        unique_together: {'username', 'email'}
     gender = models.CharField(max_length=20, choices=[(g.name, g.value) for g in Gender], default=Gender.MALE.value, null=True)
-    birth = models.DateField(null=False, default=timezone.now())
+    birth = models.DateField(null=True, blank=True)
     phone = models.CharField(max_length=12, null=True, blank=True)
     role = models.CharField(max_length=20, choices=[(r.name, r.value) for r in Role], default=Role.USER.value)
-    avatar = models.ImageField(upload_to='upload/avatars/%Y/%m', null=True, blank=True)
+    avatar = models.ImageField(upload_to='static/upload/avatars/%Y/%m', null=True, blank=True)
     street = models.CharField(max_length=45, null=True, blank=True)
     city = models.CharField(max_length=45, null=True, blank=True)
     about = models.CharField(max_length=45, null=True, blank=True)
@@ -54,6 +54,9 @@ class Category(models.Model):
 
     name = models.CharField(max_length=100, null=False, unique=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Tours(models.Model):
     class Meta:
@@ -63,11 +66,14 @@ class Tours(models.Model):
     start_date = models.DateField(null=False)
     finish_date = models.DateField(null=False)
     destination = models.CharField(max_length=255, null=False)
-    photos = models.ImageField(upload_to='upload/tours/%Y/%m', default=None)
+    photos = models.ImageField(upload_to='static/upload/tours/%Y/%m', default=None)
     price = models.DecimalField(null=True, blank=True, max_digits=10, decimal_places=2)
     active = models.BooleanField(default=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='category', related_query_name='my_category')
     tags = models.ManyToManyField('Tag', related_name='tags', related_query_name='my_tags')
+
+    def __str__(self):
+        return self.name
 
 
 class Tag(models.Model):
