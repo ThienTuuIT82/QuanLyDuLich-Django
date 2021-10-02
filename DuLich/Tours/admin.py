@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import Tours, Category, Account, Payment, TourBooking, RateTour, CommentTour, Tag
+from django.contrib.auth.models import Permission
+from .models import Tours, Category, Account, Payment, TourBooking, RateTour, CommentTour, Tag, Blog, RateBlog, \
+    CommentBlog, Province
 from django.utils.html import mark_safe
 from django import forms
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
@@ -32,7 +34,7 @@ class ToursAdmin(admin.ModelAdmin):
     form = ToursForm
 
     def avatar(self, tours):
-        return mark_safe("<img src='/static/{photos_img}' alt={alt} width='120'>".format(photos_img=tours.photos.name, alt=tours.name))
+        return mark_safe("<img src='/{photos_img}' alt={alt} width='120'>".format(photos_img=tours.photos.name, alt=tours.name))
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -42,17 +44,17 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 class AccountAdmin(admin.ModelAdmin):
-    list_display = ['username', 'email', 'is_active', 'is_superuser']
+    list_display = ['username', 'role', 'email', 'is_active', 'is_superuser']
     search_fields = ['username']
 
 
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ['date', 'price', 'description', 'user', 'tour', 'method']
+    list_display = ['created_date', 'price', 'description', 'user', 'tour', 'method']
     search_fields = ['date', 'price', 'user__username', 'tour__name', 'method']
 
 
 class TourBookingAdmin(admin.ModelAdmin):
-    list_display = ['date', 'price', 'user', 'status']
+    list_display = ['created_date', 'price', 'user', 'status']
     search_fields = ['user', 'status', 'user__username']
 
 
@@ -62,8 +64,23 @@ class RateTourAdmin(admin.ModelAdmin):
 
 
 class CommentTourAdmin(admin.ModelAdmin):
-    list_display = ['comment', 'photo', 'user', 'tour']
-    search_fields = ['comment', 'photo', 'user__username', 'tour__name']
+    list_display = ['content', 'user', 'tour', 'created_date', 'updated_date']
+    search_fields = ['content', 'user__username', 'tour__name']
+
+
+class BlogAdmin(admin.ModelAdmin):
+    list_display = ['name', 'created_date', 'user', 'description']
+    search_fields = ['name', 'created_date']
+
+
+class RateBlogAdmin(admin.ModelAdmin):
+    list_display = ['rate', 'user', 'blog']
+    search_fields = ['rate', 'user__username', 'blog__name']
+
+
+class CommentBlogAdmin(admin.ModelAdmin):
+    list_display = ['comment', 'photo', 'user', 'blog']
+    search_fields = ['comment', 'photo', 'user__username', 'blog__name']
 
 
 class TagAdmin(admin.ModelAdmin):
@@ -71,11 +88,33 @@ class TagAdmin(admin.ModelAdmin):
     search_fields = ['name']
 
 
-admin_site.register(Tours, ToursAdmin)
-admin_site.register(Category, CategoryAdmin)
-admin_site.register(Account, AccountAdmin)
-admin_site.register(Payment, PaymentAdmin)
-admin_site.register(TourBooking, TourBookingAdmin)
-admin_site.register(RateTour, RateTourAdmin)
-admin_site.register(CommentTour, CommentTourAdmin)
-admin_site.register(Tag, TagAdmin)
+class ProvinceAdmin(admin.ModelAdmin):
+    list_display = ['name']
+    search_fields = ['name']
+
+
+admin.site.register(Tours, ToursAdmin)
+admin.site.register(Category, CategoryAdmin)
+admin.site.register(Account, AccountAdmin)
+admin.site.register(Payment, PaymentAdmin)
+admin.site.register(TourBooking, TourBookingAdmin)
+admin.site.register(RateTour, RateTourAdmin)
+admin.site.register(CommentTour, CommentTourAdmin)
+admin.site.register(Tag, TagAdmin)
+admin.site.register(Blog, BlogAdmin)
+admin.site.register(RateBlog, RateBlogAdmin)
+admin.site.register(CommentBlog, CommentBlogAdmin)
+admin.site.register(Province, ProvinceAdmin)
+admin.site.register(Permission)
+# admin_site.register(Tours, ToursAdmin)
+# admin_site.register(Category, CategoryAdmin)
+# admin_site.register(Account, AccountAdmin)
+# admin_site.register(Payment, PaymentAdmin)
+# admin_site.register(TourBooking, TourBookingAdmin)
+# admin_site.register(RateTour, RateTourAdmin)
+# admin_site.register(CommentTour, CommentTourAdmin)
+# admin_site.register(Tag, TagAdmin)
+# admin_site.register(Blog, BlogAdmin)
+# admin_site.register(RateBlog, RateBlogAdmin)
+# admin_site.register(CommentBlog, CommentBlogAdmin)
+# admin_site.register(Province, ProvinceAdmin)

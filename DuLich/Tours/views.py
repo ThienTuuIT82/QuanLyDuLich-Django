@@ -3,41 +3,56 @@ from rest_framework import viewsets, permissions, status, generics
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
-from .models import Tours, Account, TourBooking, Payment, RateTour, CommentTour, Category
+from .models import Tours, Account, TourBooking, Payment, RateTour, CommentTour, Category, Tag, Province, Blog
 from .serializers import TourSerializer, AccountSerializer, TourBookingSerializer, PaymentSerializer, \
-    RateTourSerializer, CommentTourSerializer, CategorySerializer
+    RateTourSerializer, CommentTourSerializer, CategorySerializer, ProvinceSerializer, BlogSerializer
 from rest_framework.decorators import action
 from drf_yasg.utils import swagger_auto_schema
+from django.http import Http404
 
 
 class AccountViewSet(viewsets.ViewSet,
-                     generics.ListAPIView,
                      generics.CreateAPIView,
-                     generics.RetrieveAPIView,
                      generics.UpdateAPIView):
     queryset = Account.objects.filter(is_active=True)
     serializer_class = AccountSerializer
     parser_classes = [MultiPartParser, ]
-    swagger_schema = None
 
     def get_permissions(self):
-        if self.action == 'retrieve':
+        if self.action == 'current_user':
             return [permissions.IsAuthenticated()]
 
         return [permissions.AllowAny()]
+
+    @action(methods=['get'], detail=False, url_path='current-user')
+    def current_user(self, request):
+        return Response(self.serializer_class(request.user).data,
+                        status=status.HTTP_200_OK)
+
+
+class ProvinceViewSet(viewsets.ViewSet,
+                  generics.ListAPIView):
+    queryset = Province.objects.all()
+    serializer_class = ProvinceSerializer
+    pagination_class = None
+
+    def get_permissions(self):
+        if self.action == 'list':
+            return [permissions.AllowAny()]
+
+        return [permissions.IsAuthenticated()]
 
 
 class ToursPagination(PageNumberPagination):
     page_size = 9
 
 
-class TourViewSet(viewsets.ModelViewSet,
-                     generics.ListAPIView,
-                     generics.CreateAPIView):
+class TourViewSet(viewsets.ViewSet,
+                  generics.ListAPIView,
+                  generics.RetrieveAPIView):
     queryset = Tours.objects.filter(active=True)
     serializer_class = TourSerializer
     pagination_class = ToursPagination
-    # permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(
         operation_description='Add tags to a tour',
@@ -45,11 +60,24 @@ class TourViewSet(viewsets.ModelViewSet,
             status.HTTP_200_OK: TourSerializer()
         }
     )
-    def get_permissions(self):
-        if self.action == 'list':
-            return [permissions.AllowAny()]
+    # def get_permissions(self):
+    #     if self.action == 'list':
+    #         return [permissions.AllowAny()]
+    #
+    #     return [permissions.IsAuthenticated()]
 
-        return [permissions.IsAuthenticated()]
+    def get_queryset(self):
+        tours = Tours.objects.filter(active=True)
+
+        q = self.request.query_params.get('q')
+        if q is not None:
+            tours = tours.filter(name__icontains=q)
+
+        cate_id = self.request.query_params.get('category_id')
+        if cate_id is not None:
+            tours = tours.filter(category_id=cate_id)
+
+        return tours
 
     @action(methods=['post'], detail=True, url_path='hide-tour', url_name='hide-tour')
     def hide_tour(self, request, pk):
@@ -62,6 +90,46 @@ class TourViewSet(viewsets.ModelViewSet,
 
         return Response(data=TourSerializer(t, context={'request': request}).data,
                         status=status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=True, url_path='tags')
+    def add_tag(self, request, pk):
+        try:
+            tour = self.get_object()
+        except Http404:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            tags = request.data.get('tags')
+            if tags is not None:
+                for tag in tags:
+                    t, _ = Tag.objects.get_or_create(name=tag)
+                    tour.tags.add(t)
+
+                tour.save()
+                return Response(self.serializer_class(tour).data, status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    @action(methods=['post'], detail=True, url_path='add-comment')
+    def add_comment(self, request, pk):
+        content = request.data.get('content')
+        if content:
+            c = CommentTour.objects.create(content=content,
+                                           tour=self.get_object(),
+                                           user=request.user)
+
+            return Response(CommentTourSerializer(c).data, status=status.HTTP_201_CREATED)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class BlogViewSet(viewsets.ModelViewSet):
+    queryset = Blog.objects.all()
+    serializer_class = BlogSerializer
+
+    def get_permissions(self):
+        if self.action == 'list':
+            return [permissions.AllowAny()]
+
+        return [permissions.IsAuthenticated()]
 
 
 class TourBookingViewSet(viewsets.ModelViewSet):
@@ -108,15 +176,22 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return [permissions.IsAuthenticated()]
 
 
-class CommentTourViewSet(viewsets.ModelViewSet):
+class CommentTourViewSet(viewsets.ViewSet, generics.DestroyAPIView, generics.UpdateAPIView):
     queryset = CommentTour.objects.all()
     serializer_class = CommentTourSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-    def get_permissions(self):
-        if self.action == 'list':
-            return [permissions.AllowAny()]
+    def destroy(self, request, *args, **kwargs):
+        if request.user == self.get_object().user:
+            return super().destroy(request, *args, **kwargs)
 
-        return [permissions.IsAuthenticated()]
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+    def partial_update(self, request, *args, **kwargs):
+        if request.user == self.get_object().user:
+            return super().partial_update(request, *args, **kwargs)
+
+        return Response(status=status.HTTP_403_FORBIDDEN)
 
 
 def index(request):
