@@ -10,6 +10,8 @@ router.register('tourbooking', views.TourBookingViewSet)
 router.register('payments', views.PaymentViewSet)
 router.register('ratetour', views.RateTourViewSet)
 router.register('commenttour', views.CommentTourViewSet)
+router.register('province', views.ProvinceViewSet)
+router.register('blog', views.BlogViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
