@@ -55,6 +55,11 @@ REST_FRAMEWORK = {
     )
 }
 
+OAUTH2_INFO = {
+    "client_id": "rUZJW651G38Kp5p37moVfN5ESnwWT0CF7CIpWxDO",
+    "client_secret": "t2WmjliRlwdqNA4fJ8wCSC5WcAZ8TyDCPbAcdXKaSf7Vjm95xVQE9vXoi9hC4OVcVyVjNpze5oplcuqFZucgWZkphgfRsMwbFl07HJgjoAxq1vPDABHy0ea6CotLHVXH"
+}
+
 OAUTH2_PROVIDER = {
     'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore'
 }
@@ -107,7 +112,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'toursdb',
         'USER': 'root',
-        'PASSWORD': '',
+        'PASSWORD': '123456',
         'HOST': '',
         'OPTIONS': {
            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
