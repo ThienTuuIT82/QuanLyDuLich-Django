@@ -53,10 +53,10 @@ class TourSerializer(ModelSerializer):
 class TourDetailSerializer(TourSerializer):
     rate = SerializerMethodField()
 
-    def get_rate(self, lesson):
+    def get_rate(self, tour):
         request = self.context.get("request")
         if request and request.user.is_authenticated:
-            r = lesson.ratetour_set.filter(user=request.user).first()
+            r = tour.ratetour_set.filter(user=request.user).first()
             if r:
                 return r.rate
 
@@ -100,6 +100,23 @@ class CommentBlogSerializer(ModelSerializer):
     class Meta:
         model = CommentBlog
         fields = ["id", "content", "blog", 'created_date', 'updated_date', 'creator']
+
+
+class BlogDetailSerializer(BlogSerializer):
+    rate = SerializerMethodField()
+
+    def get_rate(self, blog):
+        request = self.context.get("request")
+        if request and request.user.is_authenticated:
+            r = blog.rateblog_set.filter(user=request.user).first()
+            if r:
+                return r.rate
+
+        return -1
+
+    class Meta:
+        model = BlogSerializer.Meta.model
+        fields = BlogSerializer.Meta.fields + ["rate"]
 
 
 class ProvinceSerializer(ModelSerializer):

@@ -10,7 +10,7 @@ from .models import Tours, Account, Payment, RateTour, CommentTour, Category, Ta
     TourView, CommentBlog, RateBlog
 from .serializers import TourSerializer, AccountSerializer, PaymentSerializer, \
     RateTourSerializer, CommentTourSerializer, CategorySerializer, ProvinceSerializer, BlogSerializer, \
-    TourViewSerializer, TourDetailSerializer, CommentBlogSerializer, RateBlogSerializer
+    TourViewSerializer, TourDetailSerializer, CommentBlogSerializer, RateBlogSerializer, BlogDetailSerializer
 from rest_framework.decorators import action
 from drf_yasg.utils import swagger_auto_schema
 from django.http import Http404
@@ -159,9 +159,11 @@ class TourViewSet(viewsets.ViewSet,
             status=status.HTTP_200_OK)
 
 
-class BlogViewSet(viewsets.ModelViewSet):
+class BlogViewSet(viewsets.ModelViewSet,
+                  generics.ListAPIView,
+                  generics.RetrieveAPIView):
     queryset = Blog.objects.all()
-    serializer_class = BlogSerializer
+    serializer_class = BlogDetailSerializer
 
     def get_permissions(self):
         if self.action in ['add_comment', 'rate']:
@@ -227,6 +229,17 @@ class RateTourViewSet(viewsets.ModelViewSet):
         return [permissions.IsAuthenticated()]
 
 
+class RateBlogViewSet(viewsets.ModelViewSet):
+    queryset = RateBlog.objects.all()
+    serializer_class = RateBlogSerializer
+
+    def get_permissions(self):
+        if self.action == 'list':
+            return [permissions.AllowAny()]
+
+        return [permissions.IsAuthenticated()]
+
+
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -241,6 +254,24 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class CommentTourViewSet(viewsets.ViewSet, generics.DestroyAPIView, generics.UpdateAPIView):
     queryset = CommentTour.objects.all()
     serializer_class = CommentTourSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def destroy(self, request, *args, **kwargs):
+        if request.user == self.get_object().user:
+            return super().destroy(request, *args, **kwargs)
+
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+    def partial_update(self, request, *args, **kwargs):
+        if request.user == self.get_object().user:
+            return super().partial_update(request, *args, **kwargs)
+
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+
+class CommentBlogViewSet(viewsets.ViewSet, generics.DestroyAPIView, generics.UpdateAPIView):
+    queryset = CommentBlog.objects.all()
+    serializer_class = CommentBlogSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def destroy(self, request, *args, **kwargs):
