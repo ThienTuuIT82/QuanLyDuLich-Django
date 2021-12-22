@@ -156,21 +156,22 @@ class Blog(models.Model):
 
 class RateBlog(models.Model):
     rate = models.PositiveSmallIntegerField(default=0)
-    user = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, related_name='my_user_rateblog',
-                             related_query_name='my_user_rateblog')
-    blog = models.ForeignKey(Blog, on_delete=models.SET_NULL, null=True, related_name='rate_blog',
-                             related_query_name='rate_blog')
+    created_date = models.DateTimeField(null=True, auto_now_add=True)
+    updated_date = models.DateTimeField(null=True, auto_now=True)
+    user = models.ForeignKey(Account, on_delete=models.CASCADE, null=True)
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, null=True)
+
+    class Meta:
+        unique_together = ['blog', 'user']
 
 
 class CommentBlog(models.Model):
-    comment = models.TextField()
+    content = RichTextField(default="")
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, null=True)
+    creator = models.ForeignKey(Account, on_delete=models.CASCADE, null=True)
     photo = models.FileField(upload_to='static/upload/comment/%Y/%m', null=True)
     created_date = models.DateTimeField(null=True, auto_now_add=True)
     updated_date = models.DateTimeField(null=True, auto_now=True)
-    user = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, related_name='my_user_comment_blog',
-                             related_query_name='my_user_comment_blog')
-    blog = models.ForeignKey(Blog, on_delete=models.SET_NULL, null=True, related_name='comment_blog',
-                             related_query_name='comment_blog')
 
     def __str__(self):
-        return self.comment
+        return self.content

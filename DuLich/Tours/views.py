@@ -7,10 +7,10 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.views import APIView
 
 from .models import Tours, Account, Payment, RateTour, CommentTour, Category, Tag, Province, Blog, \
-    TourView
+    TourView, CommentBlog, RateBlog
 from .serializers import TourSerializer, AccountSerializer, PaymentSerializer, \
     RateTourSerializer, CommentTourSerializer, CategorySerializer, ProvinceSerializer, BlogSerializer, \
-    TourViewSerializer, TourDetailSerializer
+    TourViewSerializer, TourDetailSerializer, CommentBlogSerializer, RateBlogSerializer
 from rest_framework.decorators import action
 from drf_yasg.utils import swagger_auto_schema
 from django.http import Http404
@@ -164,10 +164,45 @@ class BlogViewSet(viewsets.ModelViewSet):
     serializer_class = BlogSerializer
 
     def get_permissions(self):
-        if self.action == 'list':
-            return [permissions.AllowAny()]
+        if self.action in ['add_comment', 'rate']:
+            return [permissions.IsAuthenticated()]
 
-        return [permissions.IsAuthenticated()]
+        return [permissions.AllowAny()]
+
+    @action(methods=['post'], detail=True, url_path='add-comment-blog')
+    def add_comment(self, request, pk):
+        content = request.data.get('content')
+        photo = request.data.get('photo')
+        if content:
+            c = CommentBlog.objects.create(content=content,
+                                           photo=photo,
+                                           blog=self.get_object(),
+                                           creator=request.user)
+
+            return Response(CommentBlogSerializer(c).data, status=status.HTTP_201_CREATED)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=True, url_path='rating-blog')
+    def rate(self, request, pk):
+        try:
+            rate = int(request.data['rating'])
+        except IndexError or ValueError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            r = RateBlog.objects.update_or_create(user=request.user,
+                                                  blog=self.get_object(),
+                                                  defaults={"rate": rate})
+
+            return Response(RateBlogSerializer(r).data, status=status.HTTP_200_OK)
+
+    @action(methods=['get'], detail=True, url_path="comments-blog")
+    def get_comments(self, request, pk):
+        c = self.get_object()
+        return Response(
+            CommentBlogSerializer(c.commentblog_set.order_by("-id").all(), many=True,
+                                  context={"request": self.request}).data,
+            status=status.HTTP_200_OK)
 
 
 class PaymentViewSet(viewsets.ModelViewSet):

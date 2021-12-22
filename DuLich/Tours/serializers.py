@@ -88,13 +88,18 @@ class BlogSerializer(ModelSerializer):
 class RateBlogSerializer(ModelSerializer):
     class Meta:
         model = RateBlog
-        fields = ["id", "rate", "user", "blog"]
+        fields = ["id", "rate", "user", "blog", "created_date"]
 
 
 class CommentBlogSerializer(ModelSerializer):
+    creator = SerializerMethodField()
+
+    def get_creator(self, comment):
+        return AccountSerializer(comment.creator, context={"request": self.context.get('request')}).data
+
     class Meta:
         model = CommentBlog
-        fields = ["id", "comment", "user", "blog", 'created_date', 'updated_date']
+        fields = ["id", "content", "blog", 'created_date', 'updated_date', 'creator']
 
 
 class ProvinceSerializer(ModelSerializer):

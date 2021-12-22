@@ -74,8 +74,8 @@ class RateBlogAdmin(admin.ModelAdmin):
 
 
 class CommentBlogAdmin(admin.ModelAdmin):
-    list_display = ['comment', 'photo', 'user', 'blog']
-    search_fields = ['comment', 'photo', 'user__username', 'blog__name']
+    list_display = ['content', 'creator', 'blog', 'created_date', 'updated_date']
+    search_fields = ['content', 'user__username', 'blog__name']
 
 
 class TagAdmin(admin.ModelAdmin):
