@@ -219,8 +219,8 @@ class PaymentViewSet(viewsets.ModelViewSet):
 
     @action(methods=['post'], detail=True, url_path='add-payment')
     def add_payment(self, request, pk):
-        user_id = request.data.get('userId')
-        tour_id = request.data.get('tourId')
+        user_id = request.data.get('user_id')
+        tour_id = request.data.get('tour_d')
         method = request.data.get('method')
         adult = request.data.get('adult')
         children = request.data.get('children')
