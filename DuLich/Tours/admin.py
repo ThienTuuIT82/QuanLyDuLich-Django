@@ -49,7 +49,7 @@ class AccountAdmin(admin.ModelAdmin):
 
 
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ["id", "created_date", "price", "adult", "children", "status", "description", "user", "tour", "method"]
+    list_display = ["id", "created_date", "price", "adult", "children", "status", "user", "tour", "method"]
     search_fields = ['status', 'price', 'user__username', 'tour__name', 'method']
 
 
