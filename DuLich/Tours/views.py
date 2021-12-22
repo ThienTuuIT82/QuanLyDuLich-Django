@@ -210,10 +210,26 @@ class PaymentViewSet(viewsets.ModelViewSet):
     serializer_class = PaymentSerializer
 
     def get_permissions(self):
-        if self.action == 'list':
-            return [permissions.AllowAny()]
+        if self.action == 'add_payment':
+            return [permissions.IsAuthenticated()]
 
-        return [permissions.IsAuthenticated()]
+        return [permissions.AllowAny()]
+
+    @action(methods=['post'], detail=True, url_path='add-payment')
+    def add_payment(self, request, pk):
+        user_id = request.data.get('userId')
+        tour_id = request.data.get('tourId')
+        method = request.data.get('method')
+        adult = request.data.get('adult')
+        children = request.data.get('children')
+        price = request.data.get('price')
+        res = Payment.objects.create(tour=tour_id,
+                                      user=user_id,
+                                      method=method,
+                                      adult=adult,
+                                      children=children,
+                                      price=price)
+        return Response(PaymentSerializer(res).data, status=status.HTTP_201_CREATED)
 
 
 class RateTourViewSet(viewsets.ModelViewSet):

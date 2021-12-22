@@ -99,12 +99,11 @@ class Tag(models.Model):
 
 
 class Payment(models.Model):
-    created_date = models.DateField(null=False, auto_created=True)
+    created_date = models.DateField(null=True, auto_created=True)
     price = models.DecimalField(null=True, blank=True, max_digits=10, decimal_places=2)
-    description = RichTextField()
     adult = models.IntegerField(null=False, default=1)
     children = models.IntegerField(null=False, default=0)
-    status = models.CharField(max_length=20, choices=[(r.name, r.value) for r in StatusPayment], default=StatusPayment.UNPAID)
+    status = models.CharField(max_length=20, choices=[(r.name, r.value) for r in StatusPayment], default=StatusPayment.UNPAID.value, null=True)
 
     user = models.ForeignKey(Account, on_delete=models.CASCADE, null=True, related_name='user_payment',
                              related_query_name='user_payment')
